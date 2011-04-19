@@ -75,6 +75,7 @@ void ColorManipulator::convertImageToGray()
 
 void ColorManipulator::click(int x, int y)
 {
+    // ### TODO unoptimized
     QPainter alphaMaskPainter(&m_alphaLayerImage);
     alphaMaskPainter.setBrush(QColor::fromRgbF(1, 1, 1));
     alphaMaskPainter.drawEllipse(QPoint(x / scale(), y / scale()), 50, 50);
