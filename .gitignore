@@ -1,2 +1,14 @@
 
 *.pro.user
+.make.cache
+bld.inf
+Makefile
+moc/moc_*.cpp
+Recolorfy.loc
+Recolorfy.rss
+Recolorfy.sis
+Recolorfy_exe.mmp
+Recolorfy_installer.pkg
+Recolorfy_reg.rss
+Recolorfy_stub.pkg
+Recolorfy_template.pkg

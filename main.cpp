@@ -1,9 +1,13 @@
 #include <QtGui/QApplication>
+#include <QtDeclarative>
 #include "qmlapplicationviewer.h"
+#include "colormanipulator.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    qmlRegisterType<ColorManipulator>("recolorfy.qmlcomponents", 1, 0, "ColorManipulator");
 
     QmlApplicationViewer viewer;
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);

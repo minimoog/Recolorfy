@@ -1,16 +1,26 @@
 import QtQuick 1.0
+import recolorfy.qmlcomponents 1.0
 
-Rectangle {
-    width: 360
-    height: 360
-    Text {
-        text: "Hello World"
-        anchors.centerIn: parent
-    }
-    MouseArea {
+Item {
+    id: wrapper
+
+    Flickable {
+        id: flickableImage
         anchors.fill: parent
-        onClicked: {
-            Qt.quit();
+        contentWidth: colorgrayImage.width * colorgrayImage.scale
+        contentHeight: colorgrayImage.height * colorgrayImage.scale
+
+        ColorManipulator {
+            id: colorgrayImage
+            source: 'qml/Recolorfy/images/food_test.jpg'
+            transformOrigin: Item.TopLeft
+        }
+
+        MouseArea {
+            id: mousearea
+            anchors.fill: parent
+
+            onClicked: colorgrayImage.click(mouseX, mouseY)
         }
     }
 }

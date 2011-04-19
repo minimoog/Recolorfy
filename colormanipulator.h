@@ -44,6 +44,7 @@ private:
     QImage m_image;
     QImage m_grayImage;
     QImage m_alphaLayerImage;
+    QImage m_finalImage;
 };
 
 #endif // COLORMANIPULATOR_H

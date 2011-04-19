@@ -19,25 +19,21 @@
  */
 
 #include "colormanipulator.h"
+#include <QtDebug>
 #include <QPainter>
+#include <QPixmap>
+#include <QStyleOptionGraphicsItem>
 
 ColorManipulator::ColorManipulator(QDeclarativeItem *parent) :
     QDeclarativeItem(parent)
 {
     setFlag(ItemHasNoContents, false);
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-void ColorManipulator::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void ColorManipulator::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    painter->drawImage(boundingRect(), m_grayImage);
-
-    QImage imageMask(m_image.size(), QImage::Format_ARGB32_Premultiplied);
-    QPainter mask(&imageMask);
-    mask.drawImage(m_image.rect(), m_image);
-    mask.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    mask.drawImage(m_image.rect(), m_alphaLayerImage);
-
-    painter->drawImage(boundingRect(), imageMask);
+    painter->drawImage(m_grayImage.rect(), m_finalImage);
 }
 
 void ColorManipulator::setSource(const QString &source)
@@ -45,14 +41,19 @@ void ColorManipulator::setSource(const QString &source)
     if (m_source.compare(source)) {
         m_source = source;
 
-        m_image.load(source);
+        if (!m_image.load(source))
+            qDebug() << "Didn't load";
+
         setImplicitWidth(m_image.width());
         setImplicitHeight(m_image.height());
+
+        convertImageToGray();
 
         m_alphaLayerImage = QImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
         m_alphaLayerImage.fill(qRgba(255, 255, 255, 0));
 
-        convertImageToGray();
+        m_finalImage = QImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
+        m_finalImage.fill(qRgb(255, 255, 255));
 
         update();
         emit sourceChanged();
@@ -74,9 +75,19 @@ void ColorManipulator::convertImageToGray()
 
 void ColorManipulator::click(int x, int y)
 {
-    QPainter mask(&m_alphaLayerImage);
-    mask.setBrush(QColor::fromRgbF(1, 1, 1));
-    mask.drawEllipse(QPoint(x / scale(), y / scale()), 50, 50);
+    QPainter alphaMaskPainter(&m_alphaLayerImage);
+    alphaMaskPainter.setBrush(QColor::fromRgbF(1, 1, 1));
+    alphaMaskPainter.drawEllipse(QPoint(x / scale(), y / scale()), 50, 50);
+
+    QImage topLayerImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
+    QPainter topLayerPainter(&topLayerImage);
+    topLayerPainter.drawImage(m_image.rect(), m_image);
+    topLayerPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    topLayerPainter.drawImage(m_image.rect(), m_alphaLayerImage);
+
+    QPainter finalPainter(&m_finalImage);
+    finalPainter.drawImage(m_image.rect(), m_grayImage);
+    finalPainter.drawImage(m_image.rect(), topLayerImage);
 
     update();
 }
