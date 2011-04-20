@@ -52,8 +52,7 @@ void ColorManipulator::setSource(const QString &source)
         m_alphaLayerImage = QImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
         m_alphaLayerImage.fill(qRgba(255, 255, 255, 0));
 
-        m_finalImage = QImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
-        m_finalImage.fill(qRgb(255, 255, 255));
+        m_finalImage = QImage(m_grayImage);
 
         update();
         emit sourceChanged();
@@ -62,7 +61,7 @@ void ColorManipulator::setSource(const QString &source)
 
 void ColorManipulator::convertImageToGray()
 {
-    m_grayImage = QImage(m_image.size(), QImage::Format_RGB32);
+    m_grayImage = QImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
 
     // SLOW
     for (int i = 0; i < m_image.width(); ++i)
@@ -75,20 +74,42 @@ void ColorManipulator::convertImageToGray()
 
 void ColorManipulator::click(int x, int y)
 {
-    // ### TODO unoptimized
     QPainter alphaMaskPainter(&m_alphaLayerImage);
     alphaMaskPainter.setBrush(QColor::fromRgbF(1, 1, 1));
     alphaMaskPainter.drawEllipse(QPoint(x / scale(), y / scale()), 50, 50);
 
-    QImage topLayerImage(m_image.size(), QImage::Format_ARGB32_Premultiplied);
-    QPainter topLayerPainter(&topLayerImage);
-    topLayerPainter.drawImage(m_image.rect(), m_image);
-    topLayerPainter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    topLayerPainter.drawImage(m_image.rect(), m_alphaLayerImage);
+    // ### TODO radius = 50; should be inv scaled by scaled picture
+    int topLine = y / scale() - 50 - 1;
+    int bottomLine = y / scale() + 50 - 1;
+    int leftLine = x / scale() - 50 - 1;
+    int rightLine = x / scale() + 50 - 1;
+    int imgHeight = m_image.height() - 1;
+    int imgWidth = m_image.width() - 1;
 
-    QPainter finalPainter(&m_finalImage);
-    finalPainter.drawImage(m_image.rect(), m_grayImage);
-    finalPainter.drawImage(m_image.rect(), topLayerImage);
+    int firstScanLine = (topLine < 0) ? 0 : topLine;
+    int lastScanLine = (bottomLine > imgHeight) ? imgHeight : bottomLine;
+    int firstIndex = (leftLine < 0) ? 0 : leftLine;
+    int lastIndex = (rightLine > imgWidth) ? imgWidth : rightLine;
+
+    for (int i = firstScanLine; i <= lastScanLine; ++i) {
+        const QRgb* grayLine = (const QRgb*)m_grayImage.constScanLine(i);
+        const QRgb* colorLine = (const QRgb*)m_image.constScanLine(i);
+        const QRgb* alphaLine = (const QRgb*)m_alphaLayerImage.constScanLine(i);
+        QRgb* resultLine = (QRgb*)m_finalImage.scanLine(i);
+
+        for (int j = firstIndex; j <= lastIndex; ++j) {
+            QRgb colorPixel = *(colorLine + j);
+            QRgb greyPixel = *(grayLine + j);
+            QRgb alphaPixel = *(alphaLine + j);
+            int alpha = qAlpha(alphaPixel);
+
+            int r = alpha * qRed(colorPixel) + (255 - alpha) * qRed(greyPixel);
+            int g = alpha * qGreen(colorPixel) + (255 - alpha) * qGreen(greyPixel);
+            int b = alpha * qBlue(colorPixel) + (255 - alpha) * qBlue(greyPixel);
+
+            *(resultLine + j) = qRgb(r / 255, g / 255, b / 255);
+        }
+    }
 
     update();
 }
