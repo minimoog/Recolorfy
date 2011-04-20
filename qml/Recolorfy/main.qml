@@ -4,6 +4,8 @@ import recolorfy.qmlcomponents 1.0
 Item {
     id: wrapper
 
+    //width: 360; height: 640
+
     Rectangle {
         id: topBar
         z: 1
@@ -30,7 +32,71 @@ Item {
                 onClicked: {
                     flickableImage.interactive = !flickableImage.interactive
                     mouseAreaFlickableImage.enabled = !mouseAreaFlickableImage.enabled
+                    //zoomin.enabled = !zoomin.enabled
+                    zoomin.visible = !zoomin.visible
+                    //zoomout.enabled = !zoomout.enabled
+                    zoomout.visible = !zoomout.visible
                 }
+            }
+        }
+    }
+
+    Rectangle {
+        id: zoomin
+        width: 40
+        height: 40
+        color: "#ffffff"
+        visible: false
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.top: topBar.bottom
+        anchors.topMargin: 10
+        z: 1
+
+        MouseArea {
+            id: zoominMouseArea
+            anchors.fill: parent
+
+            onPressed: zoominRepeater.start()
+            onReleased: zoominRepeater.stop()
+
+            Timer {
+                id: zoominRepeater
+                interval: 1
+                repeat: true
+                triggeredOnStart: true
+
+                onTriggered: colorgrayImage.scale += 0.01
+            }
+        }
+    }
+
+    Rectangle {
+        id: zoomout
+        width: 40
+        height: 40
+        color: "#ffffff"
+        visible: false
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        z: 1
+
+        MouseArea {
+            id: zoomoutMouseArea
+            anchors.fill: parent
+
+            onPressed: zoomoutRepeater.start()
+            onReleased: zoomoutRepeater.stop()
+
+            Timer {
+                id: zoomoutRepeater
+                interval: 1
+                repeat: true
+                triggeredOnStart: true
+
+                onTriggered: colorgrayImage.scale -= 0.01
             }
         }
     }

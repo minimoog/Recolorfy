@@ -21,8 +21,6 @@
 #include "colormanipulator.h"
 #include <QtDebug>
 #include <QPainter>
-#include <QPixmap>
-#include <QStyleOptionGraphicsItem>
 
 ColorManipulator::ColorManipulator(QDeclarativeItem *parent) :
     QDeclarativeItem(parent)
@@ -31,7 +29,7 @@ ColorManipulator::ColorManipulator(QDeclarativeItem *parent) :
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-void ColorManipulator::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void ColorManipulator::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->drawImage(m_grayImage.rect(), m_finalImage);
 }
