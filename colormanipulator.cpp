@@ -72,15 +72,16 @@ void ColorManipulator::convertImageToGray()
 
 void ColorManipulator::click(int x, int y)
 {
+    int radius = 50 / scale();
+
     QPainter alphaMaskPainter(&m_alphaLayerImage);
     alphaMaskPainter.setBrush(QColor::fromRgbF(1, 1, 1));
-    alphaMaskPainter.drawEllipse(QPoint(x / scale(), y / scale()), 50, 50);
+    alphaMaskPainter.drawEllipse(QPoint(x / scale(), y / scale()), radius, radius);
 
-    // ### TODO radius = 50; should be inv scaled by scaled picture
-    int topLine = y / scale() - 50 - 1;
-    int bottomLine = y / scale() + 50 - 1;
-    int leftLine = x / scale() - 50 - 1;
-    int rightLine = x / scale() + 50 - 1;
+    int topLine = y / scale() - radius - 1;
+    int bottomLine = y / scale() + radius - 1;
+    int leftLine = x / scale() - radius - 1;
+    int rightLine = x / scale() + radius - 1;
     int imgHeight = m_image.height() - 1;
     int imgWidth = m_image.width() - 1;
 

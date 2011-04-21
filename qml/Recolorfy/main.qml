@@ -32,9 +32,7 @@ Item {
                 onClicked: {
                     flickableImage.interactive = !flickableImage.interactive
                     mouseAreaFlickableImage.enabled = !mouseAreaFlickableImage.enabled
-                    //zoomin.enabled = !zoomin.enabled
                     zoomin.visible = !zoomin.visible
-                    //zoomout.enabled = !zoomout.enabled
                     zoomout.visible = !zoomout.visible
                 }
             }
