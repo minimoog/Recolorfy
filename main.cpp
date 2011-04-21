@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 
     QmlApplicationViewer viewer;
     viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
+    viewer.setAttribute(Qt::WA_NoSystemBackground); //Symbian^3
     viewer.setMainQmlFile(QLatin1String("qml/Recolorfy/main.qml"));
     viewer.showExpanded();
 

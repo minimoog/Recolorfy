@@ -9,7 +9,7 @@ Item {
     Rectangle {
         id: topBar
         z: 1
-        height: 40
+        height: 80
         color: "#808080"
         anchors.right: parent.right
         anchors.left: parent.left
@@ -17,13 +17,13 @@ Item {
 
         Rectangle {
             id: buttonPanZoom
-            width: 30
+            width: 60
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
+            anchors.bottomMargin: 10
             anchors.top: parent.top
-            anchors.topMargin: 5
+            anchors.topMargin: 10
             anchors.left: parent.left
-            anchors.leftMargin: 5
+            anchors.leftMargin: 10
 
             MouseArea {
                 id: panZoomMouseArea
@@ -35,6 +35,24 @@ Item {
                     zoomin.visible = !zoomin.visible
                     zoomout.visible = !zoomout.visible
                 }
+            }
+        }
+
+        Rectangle {
+            id: buttonUndo
+            width: 60
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            anchors.top: parent.top
+            anchors.topMargin: 10
+            anchors.left: buttonPanZoom.right
+            anchors.leftMargin: 30
+
+            MouseArea {
+                id: buttonUndoMouseArea
+                anchors.fill: parent
+
+                onClicked: colorgrayImage.undo()
             }
         }
     }

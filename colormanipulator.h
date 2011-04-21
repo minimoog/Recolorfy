@@ -23,6 +23,12 @@
 
 #include <QDeclarativeItem>
 
+struct Circle {
+    int x;
+    int y;
+    int radius;
+};
+
 class ColorManipulator : public QDeclarativeItem
 {
     Q_OBJECT
@@ -33,18 +39,21 @@ public:
     void setSource(const QString& source);
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
     Q_INVOKABLE void click(int x, int y);
+    Q_INVOKABLE void undo();
 
 signals:
     void sourceChanged();
 
 private:
     void convertImageToGray();
+    void paintCircle(int x, int y, int radius, bool opaque);
 
     QString m_source;
     QImage m_image;
     QImage m_grayImage;
     QImage m_alphaLayerImage;
     QImage m_finalImage;
+    QList<Circle> m_paintedCircles;
 };
 
 #endif // COLORMANIPULATOR_H
