@@ -30,7 +30,7 @@ Item {
                 anchors.fill: parent
 
                 onClicked: {
-                    flickableImage.interactive = !flickableImage.interactive
+                    flickable.interactive = !flickable.interactive
                     mouseAreaFlickableImage.enabled = !mouseAreaFlickableImage.enabled
                     zoomin.visible = !zoomin.visible
                     zoomout.visible = !zoomout.visible
@@ -118,20 +118,55 @@ Item {
     }
 
     Flickable {
-        id: flickableImage
+        id: flickable
         z: 0
         anchors.top: topBar.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         interactive: false
+        clip: true
         contentWidth: colorgrayImage.width * colorgrayImage.scale
         contentHeight: colorgrayImage.height * colorgrayImage.scale
 
-        ColorManipulator {
-            id: colorgrayImage
-            source: 'qml/Recolorfy/images/food_test.jpg'
-            transformOrigin: Item.TopLeft
+        Item {
+            id: imageContainer
+            width: Math.max(colorgrayImage.width * colorgrayImage.scale, flickable.width)
+            height: Math.max(colorgrayImage.height * colorgrayImage.scale, flickable.height)
+
+            ColorManipulator {
+                id: colorgrayImage
+                property real prevScale : Math.min(scale, 1)
+                anchors.centerIn: parent
+                source: 'qml/Recolorfy/images/food_test.jpg'
+
+                scale: flickable.width / width
+
+                onScaleChanged: {
+                    if ((width * scale) > flickable.width)
+                        flickable.contentX += (flickable.width / 2 + flickable.contentX) * (scale / prevScale - 1);
+                    if ((height * scale) > flickable.height)
+                        flickable.contentY += (flickable.height / 2 + flickable.contentY) * (scale / prevScale - 1);
+                    prevScale = scale
+                }
+
+                MouseArea {
+                    id: mouseAreaFlickableImage
+                    anchors.fill: parent
+
+                    onPressed: clickRepeater.start()
+                    onReleased: clickRepeater.stop()
+
+                    Timer {
+                        id: clickRepeater
+                        interval: 1
+                        repeat: true
+                        triggeredOnStart: true
+
+                        onTriggered: colorgrayImage.click(mouseAreaFlickableImage.mouseX, mouseAreaFlickableImage.mouseY)
+                    }
+                }
+            }
         }
 
 //        Image {
@@ -140,21 +175,5 @@ Item {
 //            transformOrigin: Item.TopLeft
 //        }
 
-        MouseArea {
-            id: mouseAreaFlickableImage
-            anchors.fill: parent
-
-            onPressed: clickRepeater.start()
-            onReleased: clickRepeater.stop()
-
-            Timer {
-                id: clickRepeater
-                interval: 1
-                repeat: true
-                triggeredOnStart: true
-
-                onTriggered: colorgrayImage.click(mouseAreaFlickableImage.mouseX, mouseAreaFlickableImage.mouseY)
-            }
-        }
     }
 }

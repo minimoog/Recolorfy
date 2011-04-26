@@ -78,8 +78,8 @@ void ColorManipulator::click(int x, int y)
     // ### TODO
     // Discard duplicate coordinates
 
-    int xcenter = x / scale();
-    int ycenter = y / scale();
+    int xcenter = x;
+    int ycenter = y;
     int radius = 50 / scale();
 
     paintCircle(xcenter, ycenter, radius, true);
