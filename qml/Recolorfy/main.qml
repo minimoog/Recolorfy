@@ -1,14 +1,15 @@
 import QtQuick 1.0
+import QtMultimediaKit 1.1
 import recolorfy.qmlcomponents 1.0
 
-Item {
+Rectangle {
     id: wrapper
+    color: 'white'
 
     //width: 360; height: 640
 
     Rectangle {
         id: topBar
-        z: 1
         height: 80
         color: "#808080"
         anchors.right: parent.right
@@ -30,7 +31,7 @@ Item {
                 anchors.fill: parent
 
                 onClicked: {
-                    flickable.interactive = !flickable.interactive
+                    flickableImageEditor.interactive = !flickableImageEditor.interactive
                     mouseAreaFlickableImage.enabled = !mouseAreaFlickableImage.enabled
                     zoomin.visible = !zoomin.visible
                     zoomout.visible = !zoomout.visible
@@ -55,19 +56,35 @@ Item {
                 onClicked: colorgrayImage.undo()
             }
         }
+
+        Rectangle {
+            id: buttonShowCamera
+            width: 60
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            anchors.top: parent.top
+            anchors.topMargin: 10
+            anchors.left:  buttonUndo.right
+            anchors.leftMargin: 30
+
+            MouseArea {
+                id: buttonShowCameraMouseArea
+                anchors.fill: parent
+            }
+        }
     }
 
     Rectangle {
         id: zoomin
         width: 40
         height: 40
-        color: "#ffffff"
-        visible: false
+        color: "#000000"
+        z: 1
         anchors.right: parent.right
         anchors.rightMargin: 10
         anchors.top: topBar.bottom
         anchors.topMargin: 10
-        z: 1
+        visible: false
 
         MouseArea {
             id: zoominMouseArea
@@ -91,13 +108,13 @@ Item {
         id: zoomout
         width: 40
         height: 40
-        color: "#ffffff"
+        color: "#000000"
+        z: 1
         visible: false
         anchors.right: parent.right
         anchors.rightMargin: 10
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        z: 1
 
         MouseArea {
             id: zoomoutMouseArea
@@ -118,35 +135,35 @@ Item {
     }
 
     Flickable {
-        id: flickable
-        z: 0
+        id: flickableImageEditor
         anchors.top: topBar.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         interactive: false
         clip: true
+        visible: false
         contentWidth: colorgrayImage.width * colorgrayImage.scale
         contentHeight: colorgrayImage.height * colorgrayImage.scale
 
         Item {
             id: imageContainer
-            width: Math.max(colorgrayImage.width * colorgrayImage.scale, flickable.width)
-            height: Math.max(colorgrayImage.height * colorgrayImage.scale, flickable.height)
+            width: Math.max(colorgrayImage.width * colorgrayImage.scale, flickableImageEditor.width)
+            height: Math.max(colorgrayImage.height * colorgrayImage.scale, flickableImageEditor.height)
 
             ColorManipulator {
                 id: colorgrayImage
                 property real prevScale : Math.min(scale, 1)
                 anchors.centerIn: parent
-                source: 'qml/Recolorfy/images/food_test.jpg'
+                //source: 'qml/Recolorfy/images/food_test.jpg'
 
-                scale: flickable.width / width
+                scale: flickableImageEditor.width / width
 
                 onScaleChanged: {
-                    if ((width * scale) > flickable.width)
-                        flickable.contentX += (flickable.width / 2 + flickable.contentX) * (scale / prevScale - 1);
-                    if ((height * scale) > flickable.height)
-                        flickable.contentY += (flickable.height / 2 + flickable.contentY) * (scale / prevScale - 1);
+                    if ((width * scale) > flickableImageEditor.width)
+                        flickableImageEditor.contentX += (flickableImageEditor.width / 2 + flickableImageEditor.contentX) * (scale / prevScale - 1);
+                    if ((height * scale) > flickableImageEditor.height)
+                        flickableImageEditor.contentY += (flickableImageEditor.height / 2 + flickableImageEditor.contentY) * (scale / prevScale - 1);
                     prevScale = scale
                 }
 
@@ -168,12 +185,36 @@ Item {
                 }
             }
         }
+    }
 
-//        Image {
-//            id: colorgrayImage
-//            source: 'images/food_test.jpg'
-//            transformOrigin: Item.TopLeft
-//        }
+    Camera {
+        id: camera
 
+        visible: true
+        focus: visible
+        anchors.top: topBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        onImageSaved: {
+            console.log(path)
+            colorgrayImage.source = path
+        }
+
+        MouseArea {
+            id: mouseAreaCamera
+
+            anchors.fill: parent
+
+            onClicked: {
+                camera.captureImage()
+
+                // ### TODO: add to state
+                camera.visible = false
+                camera.focus = false
+                flickableImageEditor.visible = true
+            }
+        }
     }
 }

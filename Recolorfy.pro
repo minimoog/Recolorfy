@@ -9,7 +9,7 @@ QML_IMPORT_PATH =
 symbian:TARGET.UID3 = 0xE7E71636
 
 # Allow network access on Symbian
-symbian:TARGET.CAPABILITY += NetworkServices
+symbian:TARGET.CAPABILITY += NetworkServices UserEnvironment
 
 # Define QMLJSDEBUGGER to allow debugging of QML in debug builds
 # (This might significantly increase build time)
@@ -18,8 +18,8 @@ symbian:TARGET.CAPABILITY += NetworkServices
 # If your application uses the Qt Mobility libraries, uncomment
 # the following lines and add the respective components to the 
 # MOBILITY variable. 
-# CONFIG += mobility
-# MOBILITY +=
+CONFIG += mobility
+MOBILITY += multimedia
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \

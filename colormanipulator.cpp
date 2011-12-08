@@ -37,11 +37,22 @@ void ColorManipulator::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 void ColorManipulator::setSource(const QString &source)
 {
+    qDebug() << source;
+    QImage loadedImage;
+
     if (m_source.compare(source)) {
         m_source = source;
 
-        if (!m_image.load(source))
+        if (!loadedImage.load(source))
             qDebug() << "Didn't load";
+
+        //resize to some reasonable size
+        if (loadedImage.width() > 1000) {
+            m_image = loadedImage.scaledToWidth(1000, Qt::SmoothTransformation);
+        } else {
+            m_image = loadedImage;
+        }
+
 
         setImplicitWidth(m_image.width());
         setImplicitHeight(m_image.height());
